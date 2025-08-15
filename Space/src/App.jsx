@@ -1,11 +1,13 @@
-import { useState } from 'react'
-import './App.css'
+// src/App.jsx
+import Console from "./components/Console";
 
-function App() {
-  
-  return 
-    
-  
+export default function App() {
+  return (
+    <>
+      <Console />
+      <main className="relative">
+        {/* Your site content here */}
+      </main>
+    </>
+  );
 }
-
-export default App
