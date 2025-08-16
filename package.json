@@ -1,5 +1,8 @@
 {
   "dependencies": {
-    "swiper": "^11.2.10"
+    "@tailwindcss/vite": "^4.1.12",
+    "gsap": "^3.13.0",
+    "swiper": "^11.2.10",
+    "tailwindcss": "^4.1.12"
   }
 }
