@@ -5,30 +5,40 @@ const Mouse = () => {
   const [y, setY] = useState(0);
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const onMove = (e) => {
       setX(e.clientX);
       setY(e.clientY);
     };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
   }, []);
 
-  // Convert screen coords to lat/lon style
-  const long = ((x / window.innerWidth) * 360 - 180).toFixed(2);
-  const lat = (90 - (y / window.innerHeight) * 180).toFixed(2);
+  const w = typeof window !== "undefined" ? window.innerWidth : 1;
+  const h = typeof window !== "undefined" ? window.innerHeight : 1;
+
+  // Normalized 0..1 with 4 decimals to mirror the screenshot feel
+  const nx = (x / w).toFixed(4);
+  const ny = (y / h).toFixed(4);
 
   return (
     <div
-      className="flex gap-4 text-sm font-mono"
+      className="flex items-center gap-3 font-mono select-none"
       style={{
-        fontFamily: "'Orbitron', sans-serif", // space-themed font
-        color: "#00ffea", // neon cyan for sci-fi vibe
-        textShadow: "0 0 4px #00ffea, 0 0 8px #00ffea", // subtle glow
-        letterSpacing: "0.5px",
+        color: "rgba(255,255,255,0.9)",   // soft white
+        fontSize: "11px",                 // small & compact
+        letterSpacing: "0.6px",           // light tracking like UI HUD
+        lineHeight: 1.1,
+        pointerEvents: "none",
+        // optional: very soft baseline dots impression
+        // textDecoration: "underline dotted rgba(255,255,255,0.08)",
+        // textUnderlineOffset: "6px",
       }}
     >
-      <p>LAT: {lat}°</p>
-      <p>LON: {long}°</p>
+      <span>X.</span>
+      <span>{nx}</span>
+      <span style={{ opacity: 0.6 }}>//</span>
+      <span>Y.</span>
+      <span>{ny}</span>
     </div>
   );
 };

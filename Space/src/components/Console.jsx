@@ -1,7 +1,8 @@
-// src/components/cosole.jsx
+import React from "react";
 import Mouse from "./mouse";
+
 export default function Console() {
-  // Flush frame + styling knobs
+  // Frame parameters
   const gap = 0;            // keep 0 to hug the window edges
   const rail = 22;          // thick border
   const radius = 1;         // outer corner rounding
@@ -39,7 +40,7 @@ export default function Console() {
         }}
       />
 
-      {/* Decorative dot grid just under the frame (like the ref). Delete if not needed */}
+      {/* Decorative dot grid bands */}
       <DotGrid inset={gap} rail={rail} />
 
       {/* Top/Bottom small chamfered tabs (design accents) */}
@@ -52,7 +53,7 @@ export default function Console() {
       <Notch side="left"   gap={gap} rail={rail} w={notchW} d={notchD} slope={slope} color={color} />
       <Notch side="right"  gap={gap} rail={rail} w={notchW} d={notchD} slope={slope} color={color} />
 
-      {/* Side gray line spines (dot caps, no arrows). Line is slightly shorter than the notch */}
+      {/* Side gray line spines */}
       <SideSpine side="left"  rail={rail} notchD={notchD} />
       <SideSpine side="right" rail={rail} notchD={notchD} />
 
@@ -61,6 +62,20 @@ export default function Console() {
       <Corner className="top-1 right-1" right />
       <Corner className="bottom-1 left-1" bottom />
       <Corner className="bottom-1 right-1" right bottom />
+
+      {/* Bottom-center mouse tracker inside the border */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2"
+        style={{
+          // Position slightly above the inner edge of the bottom border.
+          // Adjust +6 (or try +8/+10) to visually center with your notch/border.
+          bottom: gap + rail + 6,
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      >
+        <Mouse />
+      </div>
     </div>
   );
 }
@@ -339,82 +354,76 @@ function Corner({ className = "", right = false, bottom = false }) {
   );
 }
 
-/* Slim gray vertical line aligned to the side notch depth (slightly shorter)
-   Rounded dot caps, NO arrows */
-/* Slim gray vertical line aligned to the side notch depth (slightly shorter)
-   Rounded dot caps, NO arrows, with vertical offset control */
-   function SideSpine({ side = "left", rail = 22, notchD = 27 }) {
-    const barOffset = Math.max(6, Math.round(rail * 1));   // distance from side edge inward
-    const lineWidth = 2;                                   // gray line thickness
-    const dotRadius = 3;                                   // dot cap radius
-    const margin = -70;                                    // shorter than notch by this on both ends
-  
-    // Nudge the whole spine up/down (px). Positive moves DOWN.
-    const offsetY = 12;
-  
-    // Line total length: a bit smaller than the notch depth
-    const lineLength = Math.max(0, notchD - margin * 2);
-    // Total container height includes dots + line + margins
-    const containerHeight = lineLength + (dotRadius * 2) * 2 + (margin * 2);
-  
-    // Attach to requested side
-    const attach = side === "left" ? { left: barOffset } : { right: barOffset };
-  
-    // Center the whole assembly on the side notch center
-    const centerOffsetFromEdge = rail + notchD / 2;
-  
-    const gray = "rgba(200,200,200,0.28)";
-    const grayShadow = "rgba(0,0,0,0.35)";
-  
-    return (
+/* Slim gray vertical line aligned to the side notch depth (slightly shorter), with vertical offset */
+function SideSpine({ side = "left", rail = 22, notchD = 27 }) {
+  const barOffset = Math.max(6, Math.round(rail * 1));   // distance from side edge inward
+  const lineWidth = 2;                                   // gray line thickness
+  const dotRadius = 3;                                   // dot cap radius
+  const margin = -70;                                    // shorter than notch by this on both ends
+  const offsetY = 12;                                    // Nudge up/down (px). Positive = down.
+
+  // Line total length: a bit smaller than notch depth
+  const lineLength = Math.max(0, notchD - margin * 2);
+  // Total container height includes dots + line + margins
+  const containerHeight = lineLength + (dotRadius * 2) * 2 + (margin * 2);
+
+  // Attach to requested side
+  const attach = side === "left" ? { left: barOffset } : { right: barOffset };
+
+  // Center the whole assembly on the side notch center
+  const centerOffsetFromEdge = rail + notchD / 2;
+
+  const gray = "rgba(200,200,200,0.28)";
+  const grayShadow = "rgba(0,0,0,0.35)";
+
+  return (
+    <div
+      className="absolute pointer-events-none"
+      style={{
+        ...attach,
+        top: `calc(50% - ${centerOffsetFromEdge}px + ${notchD / 2 - containerHeight / 2}px + ${offsetY}px)`,
+        height: containerHeight,
+        width: Math.max(lineWidth, dotRadius * 2),
+      }}
+    >
+      {/* Vertical gray line */}
       <div
-        className="absolute pointer-events-none"
+        className="absolute left-1/2 -translate-x-1/2"
         style={{
-          ...attach,
-          top: `calc(50% - ${centerOffsetFromEdge}px + ${notchD / 2 - containerHeight / 2}px + ${offsetY}px)`,
-          height: containerHeight,
-          width: Math.max(lineWidth, dotRadius * 2),
+          top: margin + dotRadius * 2,
+          height: lineLength,
+          width: lineWidth,
+          background: gray,
+          borderRadius: lineWidth,
+          boxShadow: `0 0 0.5px ${grayShadow} inset`,
         }}
-      >
-        {/* Vertical gray line */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2"
-          style={{
-            top: margin + dotRadius * 2,
-            height: lineLength,
-            width: lineWidth,
-            background: gray,
-            borderRadius: lineWidth,
-            boxShadow: `0 0 0.5px ${grayShadow} inset`,
-          }}
-        />
-  
-        {/* Top dot cap */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2"
-          style={{
-            top: margin,
-            width: dotRadius * 2,
-            height: dotRadius * 2,
-            borderRadius: dotRadius,
-            background: gray,
-            boxShadow: `0 0 0.5px ${grayShadow} inset`,
-          }}
-        />
-  
-        {/* Bottom dot cap */}
-        <div
-          className="absolute left-1/2 -translate-x-1/2"
-          style={{
-            bottom: margin,
-            width: dotRadius * 2,
-            height: dotRadius * 2,
-            borderRadius: dotRadius,
-            background: gray,
-            boxShadow: `0 0 0.5px ${grayShadow} inset`,
-          }}
-        />
-      </div>
-    );
-  }
-  
+      />
+
+      {/* Top dot cap */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2"
+        style={{
+          top: margin,
+          width: dotRadius * 2,
+          height: dotRadius * 2,
+          borderRadius: dotRadius,
+          background: gray,
+          boxShadow: `0 0 0.5px ${grayShadow} inset`,
+        }}
+      />
+
+      {/* Bottom dot cap */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2"
+        style={{
+          bottom: margin,
+          width: dotRadius * 2,
+          height: dotRadius * 2,
+          borderRadius: dotRadius,
+          background: gray,
+          boxShadow: `0 0 0.5px ${grayShadow} inset`,
+        }}
+      />
+    </div>
+  );
+}
