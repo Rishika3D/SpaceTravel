@@ -1,4 +1,5 @@
 // src/components/cosole.jsx
+import Mouse from "./mouse";
 export default function Console() {
   // Flush frame + styling knobs
   const gap = 0;            // keep 0 to hug the window edges
